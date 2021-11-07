@@ -21,6 +21,7 @@ import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.RegisterStatus
 import com.vmakd1916gmail.com.mysocialnetwork.ui.auth.VM.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import java.util.*
 
 private const val TAG = "RegisterFragment"
@@ -130,8 +131,12 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                             user.userLoginStatus = LoginUserStatus.ACTIVE
 
                             val token = createToken(user.id, it)
-                            authViewModel.insertUser(user)
-                            authViewModel.insertToken(token)
+                            runBlocking {
+                                authViewModel.insertUser(user)
+                                authViewModel.insertToken(token)
+                            }
+
+
                             APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
                         }
 
