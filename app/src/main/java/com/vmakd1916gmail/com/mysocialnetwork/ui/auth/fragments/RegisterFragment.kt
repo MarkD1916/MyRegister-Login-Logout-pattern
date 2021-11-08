@@ -1,7 +1,6 @@
 package com.vmakd1916gmail.com.mysocialnetwork.ui.auth.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,16 +10,16 @@ import androidx.fragment.app.viewModels
 import com.vmakd1916gmail.com.mysocialnetwork.R
 import com.vmakd1916gmail.com.mysocialnetwork.databinding.FragmentRegisterBinding
 import com.vmakd1916gmail.com.mysocialnetwork.models.Token
-import com.vmakd1916gmail.com.mysocialnetwork.models.local.User
 import com.vmakd1916gmail.com.mysocialnetwork.models.network.AccessTokenResponse
 import com.vmakd1916gmail.com.mysocialnetwork.models.network.TokenResponse
 import com.vmakd1916gmail.com.mysocialnetwork.models.network.UserResponse
 import com.vmakd1916gmail.com.mysocialnetwork.other.APP_AUTH_ACTIVITY
+import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.AuthStatus
 import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.LoginUserStatus
 import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.RegisterStatus
+import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.TokenVerifyStatus
 import com.vmakd1916gmail.com.mysocialnetwork.ui.auth.VM.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import java.util.*
 
@@ -33,23 +32,13 @@ class RegisterFragment : Fragment(), View.OnClickListener {
 
     private val authViewModel: AuthViewModel by viewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-
-
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentRegisterBinding.inflate(layoutInflater, container, false)
-
-
-
-
+        loginIfAuth()
         return mBinding.root
     }
 
@@ -59,58 +48,6 @@ class RegisterFragment : Fragment(), View.OnClickListener {
             APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_loginFragment)
         }
         mBinding.registerBtnId.setOnClickListener(this)
-        // TODO("Отрефакторить этот пиздец")
-        authViewModel.getUserFromDB().observe(viewLifecycleOwner) {
-            if (!it.isEmpty()) {
-                authViewModel.getCurrentActiveUser(LoginUserStatus.ACTIVE)
-                    .observe(viewLifecycleOwner) {
-                        if (it!=null) {
-                            authViewModel.getTokenByUserId(it.id).observe(viewLifecycleOwner) {
-                                if (!it[0].token.isEmpty()) {
-                                    authViewModel.verifyToken(AccessTokenResponse(it[0].token[0].access_token))
-                                        .observe(viewLifecycleOwner) {
-                                            if (it == RegisterStatus.SUCCESS) {
-
-                                                APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
-                                            }
-                                        }
-                                } else {
-                                    mBinding.progressBar.visibility = View.GONE
-                                }
-                            }
-                        }
-                        else {
-                            mBinding.progressBar.visibility = View.GONE
-                        }
-                    }
-            }
-            else{
-                mBinding.progressBar.visibility = View.GONE
-            }
-        }
-
-    }
-
-    override fun onStart() {
-        super.onStart()
-    }
-
-    private fun createUserResponse(userName: String, userPassword: String): UserResponse {
-        return UserResponse(userName, userPassword)
-    }
-
-    private fun createUser(userName: String, userPassword: String): User {
-        return User(UUID.randomUUID(), userName, userPassword, LoginUserStatus.NOT_ACTIVE)
-    }
-
-
-    private fun createToken(user_id: UUID, tokenResponse: TokenResponse): Token {
-        return Token(
-            UUID.randomUUID(),
-            user_id,
-            tokenResponse.refresh_token,
-            tokenResponse.access_token
-        )
     }
 
     override fun onClick(v: View) {
@@ -119,36 +56,59 @@ class RegisterFragment : Fragment(), View.OnClickListener {
             val userName = mBinding.loginEditTextTextPersonName.text.toString()
             val userPassword = mBinding.loginEditTextTextPassword.text.toString()
 
-            val userResponse = createUserResponse(userName, userPassword)
+            val userResponse = authViewModel.createUserResponse(userName, userPassword)
 
-            val user = createUser(userName, userPassword)
-            userResponse.let {
-                authViewModel.registerUser(it).observe(viewLifecycleOwner) {
+            authViewModel.registerUser(userResponse).observe(viewLifecycleOwner) {
+                if (it == RegisterStatus.SUCCESS) {
+                    auth(userResponse)
+                }
 
-                    if (it == RegisterStatus.SUCCESS) {
-                        authViewModel.authUser(userResponse).observe(viewLifecycleOwner) {
-
-                            user.userLoginStatus = LoginUserStatus.ACTIVE
-
-                            val token = createToken(user.id, it)
-                            runBlocking {
-                                authViewModel.insertUser(user)
-                                authViewModel.insertToken(token)
-                            }
-
-
-                            APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
-                        }
-
-                    }
-
-                    if (it == RegisterStatus.FAIL) {
-                        Toast.makeText(APP_AUTH_ACTIVITY,"You are already register", Toast.LENGTH_SHORT).show()
-                    }
+                if (it == RegisterStatus.FAIL) {
+                    Toast.makeText(
+                        APP_AUTH_ACTIVITY,
+                        "You are already register",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
+        }
+    }
 
+
+    private fun auth(userResponse: UserResponse) {
+        authViewModel.authUser(userResponse).observe(viewLifecycleOwner) {
+            when (it) {
+                AuthStatus.SUCCESS -> {
+                    APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
+                }
+                AuthStatus.FAIL->{
+                    Toast.makeText(APP_AUTH_ACTIVITY,"Sorry smth go wrong!", Toast.LENGTH_SHORT).show()
+                }
+
+
+            }
 
         }
     }
+
+    private fun loginIfAuth() {
+        authViewModel.getCurrentActiveUser(LoginUserStatus.ACTIVE)
+            .observe(viewLifecycleOwner) { user ->
+                if (user != null) {
+                    authViewModel.getTokenByUserId(user.id)
+                        .observe(viewLifecycleOwner) { userAndToken ->
+                            val token = userAndToken[0].token[0]
+                            authViewModel.verifyToken(AccessTokenResponse(token.access_token))
+                                .observe(viewLifecycleOwner) {
+                                    if (it == TokenVerifyStatus.SUCCESS) {
+                                        APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
+                                    }
+                                }
+                        }
+                } else {
+                    mBinding.progressBar.visibility = View.GONE
+                }
+            }
+    }
+
 }

@@ -1,7 +1,6 @@
 package com.vmakd1916gmail.com.mysocialnetwork.repositories.auth
 
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.vmakd1916gmail.com.mysocialnetwork.DB.MySocialNetworkDAO
@@ -11,11 +10,8 @@ import com.vmakd1916gmail.com.mysocialnetwork.models.local.User
 import com.vmakd1916gmail.com.mysocialnetwork.models.network.AccessTokenResponse
 import com.vmakd1916gmail.com.mysocialnetwork.models.network.TokenResponse
 import com.vmakd1916gmail.com.mysocialnetwork.models.network.UserResponse
-import com.vmakd1916gmail.com.mysocialnetwork.other.APP_AUTH_ACTIVITY
 import com.vmakd1916gmail.com.mysocialnetwork.services.AuthService
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.runBlocking
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -29,7 +25,7 @@ class AuthRepositoryImpl @Inject constructor(
     private val mySocialNetworkDAO: MySocialNetworkDAO
 ) {
 
-    //ToDo Нужно добавить конкретные сообщения от чего ебается: уже зареган, пароль херовый, время ответа сервера слишком долгое в общем по документации посмотреть
+
     fun registerUser(user: UserResponse):LiveData<RegisterStatus> {
         val call = authService.registerUser(user)
         val registerLiveData = MutableLiveData<RegisterStatus>()
@@ -53,26 +49,58 @@ class AuthRepositoryImpl @Inject constructor(
         return registerLiveData
     }
 
-    //ToDo Та же история, успешную авторизацию нужно отслеживать, неуспешную тоже
-    fun authUser(user: UserResponse): MutableLiveData<TokenResponse> {
+    private fun createToken(user_id: UUID, tokenResponse: TokenResponse): Token {
+        return Token(
+            UUID.randomUUID(),
+            user_id,
+            tokenResponse.refresh_token,
+            tokenResponse.access_token
+        )
+    }
+
+    fun createUser(userName: String, userPassword: String): User {
+        return User(UUID.randomUUID(),
+            userName,
+            userPassword,
+            LoginUserStatus.NOT_ACTIVE)
+    }
+
+    fun authUser(user: UserResponse): MutableLiveData<AuthStatus> {
         val call = authService.authUser(user)
-        val tokenResponse = MutableLiveData<TokenResponse>()
+        val tokenResponse = MutableLiveData<AuthStatus>()
         call?.enqueue(object : Callback<TokenResponse?> {
             override fun onResponse(
                 call: Call<TokenResponse?>,
                 response: Response<TokenResponse?>
             ) {
-                tokenResponse.value = response.body()
+                if (response.code()==200) {
+                    val user = createUser(user.name, user.password)
+                    user.userLoginStatus = LoginUserStatus.ACTIVE
+                    val token = response.body()?.let {
+                        createToken(user.id, it)
+                    }
+                    runBlocking {
+                        insertUser(user)
+                        if (token != null) {
+                            insertToken(token)
+                        }
+                    }
+                    tokenResponse.value = AuthStatus.SUCCESS
+                }
+                else{
+                    tokenResponse.value = AuthStatus.FAIL
+                }
             }
 
             override fun onFailure(call: Call<TokenResponse?>, t: Throwable) {
+                tokenResponse.value = AuthStatus.FAIL
             }
         }
         )
         return tokenResponse
     }
 
-    //ToDo вот эта хрень для того чтобы у нас не наебывался вход в приложение - когда токен не валиден его нужно рефрешить
+
     fun refreshToken(tokenId: UUID, refresh_token: String) {
         val call = authService.refreshToken(refresh_token)
 
@@ -87,28 +115,21 @@ class AuthRepositoryImpl @Inject constructor(
         )
     }
 
-    //ToDo то же самое причины наебывания
-    fun verifyToken(token:AccessTokenResponse):LiveData<RegisterStatus>{
+
+    fun verifyToken(token:AccessTokenResponse):LiveData<TokenVerifyStatus>{
         val call = authService.verifyToken(token)
-        val registerLiveData = MutableLiveData<RegisterStatus>()
+        val registerLiveData = MutableLiveData<TokenVerifyStatus>()
         call?.enqueue(object : Callback<AccessTokenResponse?> {
             override fun onFailure(call: Call<AccessTokenResponse?>, t: Throwable?) {
-                registerLiveData.value = RegisterStatus.FAIL
-                Log.d(TAG, "verifyToken onFailure: $t")
-
+                registerLiveData.value = TokenVerifyStatus.FAIL
             }
-
             override fun onResponse(call: Call<AccessTokenResponse?>, response: Response<AccessTokenResponse?>) {
-                Log.d(TAG, "verifyToken onFailure: $response")
                 if (response.code()==400){
-                    registerLiveData.value = RegisterStatus.FAIL
-
+                    registerLiveData.value = TokenVerifyStatus.FAIL
                 }
                 if (response.code()==200) {
-                    registerLiveData.value = RegisterStatus.SUCCESS
+                    registerLiveData.value = TokenVerifyStatus.SUCCESS
                 }
-
-
             }
         })
         return registerLiveData

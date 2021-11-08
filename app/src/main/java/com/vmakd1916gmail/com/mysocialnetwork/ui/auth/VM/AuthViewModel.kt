@@ -7,9 +7,7 @@ import com.vmakd1916gmail.com.mysocialnetwork.models.local.User
 import com.vmakd1916gmail.com.mysocialnetwork.models.network.AccessTokenResponse
 import com.vmakd1916gmail.com.mysocialnetwork.models.network.TokenResponse
 import com.vmakd1916gmail.com.mysocialnetwork.models.network.UserResponse
-import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.AuthRepositoryImpl
-import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.LoginUserStatus
-import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.RegisterStatus
+import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,31 +24,10 @@ class AuthViewModel @Inject constructor(private val repository: AuthRepositoryIm
     }
 
 
-    fun authUser(user: UserResponse): LiveData<TokenResponse> {
+    fun authUser(user: UserResponse): LiveData<AuthStatus> {
         return repository.authUser(user)
     }
 
-
-
-//    fun getAccessToken(): String {
-//        //нужно достать токен из БД и дальше его радостно юзать
-//        return ""
-//    }
-//
-//    fun getRefreshToken(): String {
-//        //нужно достать токен из БД и дальше его радостно юзать
-//        return ""
-//    }
-//
-//    fun getTokenResponse(): TokenResponse{
-//
-//    }
-
-    fun insertUser(user: User) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.insertUser(user)
-        }
-    }
 
     fun insertToken(token: Token) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -70,14 +47,13 @@ class AuthViewModel @Inject constructor(private val repository: AuthRepositoryIm
         return repository.getTokenByUserId(user_id)
     }
 
-    fun verifyToken(token:AccessTokenResponse):LiveData<RegisterStatus>{
+    fun verifyToken(token:AccessTokenResponse):LiveData<TokenVerifyStatus>{
         return repository.verifyToken(token)
     }
 
-    fun updateUserStatus(loginStatus: LoginUserStatus, user_id: UUID) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.updateUserStatus(loginStatus, user_id)
-        }
 
+    fun createUserResponse(userName: String, userPassword: String): UserResponse {
+        return UserResponse(userName, userPassword)
     }
+
 }

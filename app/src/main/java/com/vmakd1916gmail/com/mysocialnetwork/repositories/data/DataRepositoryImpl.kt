@@ -1,15 +1,13 @@
 package com.vmakd1916gmail.com.mysocialnetwork.repositories.data
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.vmakd1916gmail.com.mysocialnetwork.DB.MySocialNetworkDAO
 import com.vmakd1916gmail.com.mysocialnetwork.models.Token
 import com.vmakd1916gmail.com.mysocialnetwork.models.UserAndToken
 import com.vmakd1916gmail.com.mysocialnetwork.models.local.User
-import com.vmakd1916gmail.com.mysocialnetwork.models.network.UserResponse
+import com.vmakd1916gmail.com.mysocialnetwork.models.network.AccessTokenResponse
 import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.LoginUserStatus
-import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.RegisterStatus
 import com.vmakd1916gmail.com.mysocialnetwork.services.AuthService
 import com.vmakd1916gmail.com.mysocialnetwork.services.DataService
 import retrofit2.Call
@@ -27,6 +25,7 @@ class DataRepositoryImpl @Inject constructor(
 ) {
 
     fun getDataForLoginUser(accessToken: String): LiveData<String> {
+
         val call = dataService.getDataLoginUser("Bearer $accessToken")
         val liveData = MutableLiveData<String>()
         call?.enqueue(object : Callback<String?> {

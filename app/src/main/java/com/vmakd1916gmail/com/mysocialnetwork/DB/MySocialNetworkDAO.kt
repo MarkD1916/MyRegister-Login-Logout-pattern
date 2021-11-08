@@ -7,7 +7,6 @@ import com.vmakd1916gmail.com.mysocialnetwork.models.Token
 import com.vmakd1916gmail.com.mysocialnetwork.models.UserAndToken
 import com.vmakd1916gmail.com.mysocialnetwork.models.local.User
 import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.LoginUserStatus
-import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.RegisterStatus
 import java.util.*
 
 

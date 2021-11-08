@@ -1,19 +1,15 @@
 package com.vmakd1916gmail.com.mysocialnetwork.ui.auth.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.vmakd1916gmail.com.mysocialnetwork.R
 import com.vmakd1916gmail.com.mysocialnetwork.databinding.FragmentDataForUserBinding
-import com.vmakd1916gmail.com.mysocialnetwork.databinding.FragmentRegisterBinding
 import com.vmakd1916gmail.com.mysocialnetwork.other.APP_AUTH_ACTIVITY
 import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.LoginUserStatus
-import com.vmakd1916gmail.com.mysocialnetwork.ui.auth.VM.AuthViewModel
 import com.vmakd1916gmail.com.mysocialnetwork.ui.auth.VM.DataViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -38,12 +34,11 @@ class DataForUserFragment:Fragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
         mBinding.logoutButtonId.setOnClickListener(this)
     }
-    //ToDo надо чет придумать с вещами которые не равны null
+
     override fun onStart() {
         super.onStart()
 
         dataViewModel.getCurrentActiveUser(LoginUserStatus.ACTIVE).observe(viewLifecycleOwner){
-
             if(it!=null) {
                 dataViewModel.getTokenByUserId(it.id).observe(viewLifecycleOwner) {
                     dataViewModel.getDataForLoginUser(it[0].token[0].access_token)
