@@ -1,6 +1,7 @@
 package com.vmakd1916gmail.com.mysocialnetwork.ui.auth.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,11 +11,13 @@ import androidx.fragment.app.viewModels
 import com.vmakd1916gmail.com.mysocialnetwork.R
 import com.vmakd1916gmail.com.mysocialnetwork.databinding.FragmentLoginBinding
 import com.vmakd1916gmail.com.mysocialnetwork.models.Token
+import com.vmakd1916gmail.com.mysocialnetwork.models.network.AccessTokenResponse
 import com.vmakd1916gmail.com.mysocialnetwork.models.network.TokenResponse
 import com.vmakd1916gmail.com.mysocialnetwork.models.network.UserResponse
 import com.vmakd1916gmail.com.mysocialnetwork.other.APP_AUTH_ACTIVITY
 import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.AuthStatus
 import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.LoginUserStatus
+import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.TokenVerifyStatus
 import com.vmakd1916gmail.com.mysocialnetwork.ui.auth.VM.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
@@ -40,7 +43,6 @@ class LoginFragment : Fragment(), View.OnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         mBinding.goToRegisterBtnId.setOnClickListener {
             APP_AUTH_ACTIVITY.navController.navigate(R.id.action_loginFragment_to_registerFragment)
         }
@@ -48,20 +50,18 @@ class LoginFragment : Fragment(), View.OnClickListener {
     }
 
 
-    fun loginUser(authStatus: AuthStatus) {
-        when (authStatus) {
-            AuthStatus.SUCCESS -> {
-                APP_AUTH_ACTIVITY.navController.navigate(R.id.action_loginFragment_to_dataForUser)
-            }
-            AuthStatus.FAIL -> {
-                Toast.makeText(
-                    APP_AUTH_ACTIVITY,
-                    "Sorry smth go wrong!",
-                    Toast.LENGTH_SHORT
-                ).show()
+    private fun auth(userResponse: UserResponse) {
+        authViewModel.authUser(userResponse).observe(viewLifecycleOwner) {
+            when (it) {
+                AuthStatus.SUCCESS -> {
+                    APP_AUTH_ACTIVITY.navController.navigate(R.id.action_loginFragment_to_dataForUser)
+                }
+                AuthStatus.FAIL -> {
+                    Toast.makeText(APP_AUTH_ACTIVITY, "Sorry smth go wrong!", Toast.LENGTH_SHORT)
+                        .show()
+                }
             }
         }
-
     }
 
     override fun onClick(v: View) {
@@ -69,28 +69,9 @@ class LoginFragment : Fragment(), View.OnClickListener {
 
             val userName = mBinding.registerEditTextTextPersonName.text.toString()
             val userPassword = mBinding.registerEditTextTextPassword.text.toString()
+            val userResponse = authViewModel.createUserResponse(userName, userPassword)
+            auth(userResponse)
 
-            authViewModel.getUserFromDB().observe(viewLifecycleOwner) { users ->
-                if (users.isEmpty()) {
-                    val userResponse = authViewModel.createUserResponse(userName, userPassword)
-                    authViewModel.authUser(userResponse).observe(viewLifecycleOwner) {
-                        loginUser(it)
-                    }
-                } else {
-                    users.forEach {
-                        if (it.name == userName && it.password == userPassword) {
-                            authViewModel.authUser(UserResponse(userName, userPassword))
-                                .observe(viewLifecycleOwner) {
-                                    loginUser(it)
-                                }
-                        }
-                        else{
-                            Toast.makeText(APP_AUTH_ACTIVITY,"Sorry wrong password or name", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }
-
-            }
         }
     }
 }

@@ -20,6 +20,7 @@ import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.RegisterStatus
 import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.TokenVerifyStatus
 import com.vmakd1916gmail.com.mysocialnetwork.ui.auth.VM.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
 import java.util.*
 
@@ -81,34 +82,34 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                 AuthStatus.SUCCESS -> {
                     APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
                 }
-                AuthStatus.FAIL->{
-                    Toast.makeText(APP_AUTH_ACTIVITY,"Sorry smth go wrong!", Toast.LENGTH_SHORT).show()
+                AuthStatus.FAIL -> {
+                    Toast.makeText(APP_AUTH_ACTIVITY, "Sorry smth go wrong!", Toast.LENGTH_SHORT)
+                        .show()
                 }
 
 
             }
 
         }
+
     }
 
     private fun loginIfAuth() {
-        authViewModel.getCurrentActiveUser(LoginUserStatus.ACTIVE)
-            .observe(viewLifecycleOwner) { user ->
-                if (user != null) {
-                    authViewModel.getTokenByUserId(user.id)
-                        .observe(viewLifecycleOwner) { userAndToken ->
-                            val token = userAndToken[0].token[0]
-                            authViewModel.verifyToken(AccessTokenResponse(token.access_token))
-                                .observe(viewLifecycleOwner) {
-                                    if (it == TokenVerifyStatus.SUCCESS) {
-                                        APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
-                                    }
-                                }
+        authViewModel.getToken().observe(viewLifecycleOwner) {
+            if (it != null) {
+                authViewModel.verifyToken(AccessTokenResponse(it.access_token))
+                    .observe(viewLifecycleOwner) {
+                        when (it) {
+                            TokenVerifyStatus.SUCCESS -> {
+                                APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
+                            }
                         }
-                } else {
-                    mBinding.progressBar.visibility = View.GONE
-                }
+                    }
             }
+            else{
+                mBinding.progressBar.visibility = View.GONE
+            }
+        }
     }
 
 }

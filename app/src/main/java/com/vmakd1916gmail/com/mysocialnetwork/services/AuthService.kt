@@ -15,7 +15,7 @@ interface AuthService {
     fun registerUser(@Body user: UserResponse?): Call<UserResponse?>?
 
     @POST("auth/jwt/create/")
-    fun authUser(@Body user: UserResponse?): Call<TokenResponse?>?
+    fun authUser(@Body user: UserResponse?): Call<TokenResponse>
 
     @POST("auth/jwt/refresh/")
     fun refreshToken(@Body refreshToken:String): Call<String?>?

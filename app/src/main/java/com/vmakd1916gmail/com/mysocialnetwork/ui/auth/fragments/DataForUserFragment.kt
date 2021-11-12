@@ -8,8 +8,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.vmakd1916gmail.com.mysocialnetwork.R
 import com.vmakd1916gmail.com.mysocialnetwork.databinding.FragmentDataForUserBinding
+import com.vmakd1916gmail.com.mysocialnetwork.models.network.AccessTokenResponse
 import com.vmakd1916gmail.com.mysocialnetwork.other.APP_AUTH_ACTIVITY
 import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.LoginUserStatus
+import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.TokenVerifyStatus
 import com.vmakd1916gmail.com.mysocialnetwork.ui.auth.VM.DataViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -32,42 +34,34 @@ class DataForUserFragment:Fragment(), View.OnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mBinding.logoutButtonId.setOnClickListener(this)
-    }
 
-    override fun onStart() {
-        super.onStart()
-
-        dataViewModel.getCurrentActiveUser(LoginUserStatus.ACTIVE).observe(viewLifecycleOwner){
-            if(it!=null) {
-                dataViewModel.getTokenByUserId(it.id).observe(viewLifecycleOwner) {
-                    dataViewModel.getDataForLoginUser(it[0].token[0].access_token)
-                        .observe(viewLifecycleOwner) {
+        dataViewModel.getToken().observe(viewLifecycleOwner){
+            val token = it
+            dataViewModel.verifyToken(AccessTokenResponse(it.access_token)).observe(viewLifecycleOwner){
+                when(it){
+                    TokenVerifyStatus.SUCCESS->{
+                        dataViewModel.getDataForLoginUser(token.access_token).observe(viewLifecycleOwner){
                             mBinding.answerFromServerAuthId.text = it
-                            mBinding.logoutButtonId.visibility = View.VISIBLE
                         }
+                    }
                 }
             }
+
         }
 
         dataViewModel.getDataForAllUser().observe(viewLifecycleOwner){
             mBinding.answerFromServerAllId.text = it
         }
+        mBinding.logoutButtonId.setOnClickListener(this)
     }
 
     override fun onClick(v: View) {
         if (v.id==R.id.logout_button_id){
-            dataViewModel.getCurrentActiveUser(LoginUserStatus.ACTIVE).observe(viewLifecycleOwner){
-                if (it!=null) {
-                    dataViewModel.updateUserStatus(LoginUserStatus.NOT_ACTIVE, it.id)
-
-                    dataViewModel.getTokenByUserId(it.id).observe(viewLifecycleOwner) {
-                        dataViewModel.logoutUser(it[0].token[0])
-                        APP_AUTH_ACTIVITY.navController.navigate(R.id.action_dataForUser_to_loginFragment)
-
-                    }
-                }
+            dataViewModel.getToken().observe(viewLifecycleOwner) {
+                val token = it
+                dataViewModel.deleteToken(token)
             }
+            APP_AUTH_ACTIVITY.navController.navigate(R.id.action_dataForUser_to_loginFragment)
         }
     }
 }
