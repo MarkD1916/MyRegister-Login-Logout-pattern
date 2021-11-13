@@ -1,7 +1,6 @@
 package com.vmakd1916gmail.com.mysocialnetwork.ui.auth.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,17 +9,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.vmakd1916gmail.com.mysocialnetwork.R
 import com.vmakd1916gmail.com.mysocialnetwork.databinding.FragmentLoginBinding
-import com.vmakd1916gmail.com.mysocialnetwork.models.Token
-import com.vmakd1916gmail.com.mysocialnetwork.models.network.AccessTokenResponse
-import com.vmakd1916gmail.com.mysocialnetwork.models.network.TokenResponse
 import com.vmakd1916gmail.com.mysocialnetwork.models.network.UserResponse
 import com.vmakd1916gmail.com.mysocialnetwork.other.APP_AUTH_ACTIVITY
 import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.AuthStatus
-import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.LoginUserStatus
-import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.TokenVerifyStatus
 import com.vmakd1916gmail.com.mysocialnetwork.ui.auth.VM.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
 
 private const val TAG = "LoginFragment"
 
@@ -66,9 +59,8 @@ class LoginFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(v: View) {
         if (v.id == R.id.login_btn_id) {
-
-            val userName = mBinding.registerEditTextTextPersonName.text.toString()
-            val userPassword = mBinding.registerEditTextTextPassword.text.toString()
+            val userName = "Mark1"//mBinding.registerEditTextTextPersonName.text.toString()
+            val userPassword = "1234567890" //mBinding.registerEditTextTextPassword.text.toString()
             val userResponse = authViewModel.createUserResponse(userName, userPassword)
             auth(userResponse)
 

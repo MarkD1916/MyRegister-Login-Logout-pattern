@@ -9,20 +9,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.vmakd1916gmail.com.mysocialnetwork.R
 import com.vmakd1916gmail.com.mysocialnetwork.databinding.FragmentRegisterBinding
-import com.vmakd1916gmail.com.mysocialnetwork.models.Token
-import com.vmakd1916gmail.com.mysocialnetwork.models.network.AccessTokenResponse
-import com.vmakd1916gmail.com.mysocialnetwork.models.network.TokenResponse
+import com.vmakd1916gmail.com.mysocialnetwork.models.network.VerifyTokenResponse
+import com.vmakd1916gmail.com.mysocialnetwork.models.network.RefreshTokenResponse
 import com.vmakd1916gmail.com.mysocialnetwork.models.network.UserResponse
 import com.vmakd1916gmail.com.mysocialnetwork.other.APP_AUTH_ACTIVITY
-import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.AuthStatus
-import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.LoginUserStatus
-import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.RegisterStatus
-import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.TokenVerifyStatus
+import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.*
 import com.vmakd1916gmail.com.mysocialnetwork.ui.auth.VM.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.runBlocking
-import java.util.*
 
 private const val TAG = "RegisterFragment"
 
@@ -86,8 +79,6 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                     Toast.makeText(APP_AUTH_ACTIVITY, "Sorry smth go wrong!", Toast.LENGTH_SHORT)
                         .show()
                 }
-
-
             }
 
         }
@@ -97,11 +88,21 @@ class RegisterFragment : Fragment(), View.OnClickListener {
     private fun loginIfAuth() {
         authViewModel.getToken().observe(viewLifecycleOwner) {
             if (it != null) {
-                authViewModel.verifyToken(AccessTokenResponse(it.access_token))
+                val token = it
+                authViewModel.verifyToken(VerifyTokenResponse(it.access_token))
                     .observe(viewLifecycleOwner) {
                         when (it) {
                             TokenVerifyStatus.SUCCESS -> {
                                 APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
+                            }
+                            TokenVerifyStatus.FAIL->{
+                                authViewModel.refreshToken(RefreshTokenResponse(token.refresh_token)).observe(viewLifecycleOwner){
+                                    when(it){
+                                        RefreshStatus.SUCCESS->{
+                                            APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

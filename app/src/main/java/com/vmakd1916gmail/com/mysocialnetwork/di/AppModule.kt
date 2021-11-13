@@ -10,8 +10,10 @@ import com.vmakd1916gmail.com.mysocialnetwork.DB.MySocialNetworkDatabase
 import com.vmakd1916gmail.com.mysocialnetwork.R
 import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.AuthRepositoryImpl
 import com.vmakd1916gmail.com.mysocialnetwork.repositories.data.DataRepositoryImpl
+import com.vmakd1916gmail.com.mysocialnetwork.repositories.verify.VerifyRepositoryImpl
 import com.vmakd1916gmail.com.mysocialnetwork.services.AuthService
 import com.vmakd1916gmail.com.mysocialnetwork.services.DataService
+import com.vmakd1916gmail.com.mysocialnetwork.services.VerifyService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -79,6 +81,17 @@ object AppModule {
         dataService: DataService,
         mySocialNetworkDAO: MySocialNetworkDAO
     ): DataRepositoryImpl = DataRepositoryImpl(dataService,authService, mySocialNetworkDAO)
+
+    @Provides
+    @Singleton
+    fun provideVerifyService(retrofit: Retrofit): VerifyService =
+        retrofit.create(VerifyService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideVerifyRepository(
+        verifyServiceService: VerifyService,
+    ): VerifyRepositoryImpl = VerifyRepositoryImpl(verifyServiceService)
 
 
     @Provides

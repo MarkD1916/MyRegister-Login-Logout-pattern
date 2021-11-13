@@ -18,6 +18,9 @@ interface MySocialNetworkDAO {
     @Query("SELECT * FROM token_table")
     fun getToken():LiveData<Token>
 
+    @Query("UPDATE token_table SET access_token=:accessToken")
+    fun updateAccessToken(accessToken:String)
+
     @Delete
     fun deleteToken(token:Token)
 }

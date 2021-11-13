@@ -8,7 +8,7 @@ enum class AuthStatus {
     SUCCESS, FAIL
 }
 
-enum class ActiveUserStatus{
+enum class RefreshStatus{
     SUCCESS, FAIL
 }
 
