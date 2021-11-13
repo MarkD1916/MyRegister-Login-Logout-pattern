@@ -40,7 +40,7 @@ class DataForUserFragment : Fragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         observerToken = Observer {
-            token = it?: Token()
+            token = it ?: Token()
             dataViewModel.verifyToken(VerifyTokenResponse(token.access_token))
                 .observe(viewLifecycleOwner) {
                     when (it) {
@@ -49,33 +49,37 @@ class DataForUserFragment : Fragment(), View.OnClickListener {
                                 .observe(viewLifecycleOwner) {
                                     mBinding.answerFromServerAuthId.text = it
                                 }
+                            mBinding.logoutButtonId.visibility = View.VISIBLE
+                        }
+                        TokenVerifyStatus.FAIL ->{
+
                         }
                     }
                 }
         }
 
-    dataViewModel.getToken().observe(viewLifecycleOwner, observerToken)
+        dataViewModel.getToken().observe(viewLifecycleOwner, observerToken)
 
-    dataViewModel.getDataForAllUser().observe(viewLifecycleOwner)
-    {
-        mBinding.answerFromServerAllId.text = it
+        dataViewModel.getDataForAllUser().observe(viewLifecycleOwner)
+        {
+            mBinding.answerFromServerAllId.text = it
+        }
+        mBinding.logoutButtonId.setOnClickListener(this)
     }
-    mBinding.logoutButtonId.setOnClickListener(this)
-}
 
-override fun onClick(v: View) {
-    if (v.id == R.id.logout_button_id) {
-        if (token != null) {
-            dataViewModel.deleteToken(token!!) {
+    override fun onClick(v: View) {
+        if (v.id == R.id.logout_button_id) {
+
+            dataViewModel.deleteToken(token) {
                 APP_AUTH_ACTIVITY.navController.navigate(R.id.action_dataForUser_to_loginFragment)
             }
+
         }
     }
-}
 
-override fun onDestroyView() {
-    super.onDestroyView()
-    dataViewModel.getToken().removeObserver(observerToken)
-    _binding = null
-}
+    override fun onDestroyView() {
+        super.onDestroyView()
+        dataViewModel.getToken().removeObserver(observerToken)
+        _binding = null
+    }
 }
