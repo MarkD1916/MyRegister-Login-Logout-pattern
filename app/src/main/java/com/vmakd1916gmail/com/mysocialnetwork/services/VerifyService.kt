@@ -7,5 +7,5 @@ import retrofit2.http.POST
 
 interface VerifyService {
     @POST("auth/jwt/verify/")
-    fun verifyToken(@Body token: VerifyTokenResponse): Call<VerifyTokenResponse?>?
+    fun verifyToken(@Body token: VerifyTokenResponse?): Call<VerifyTokenResponse?>?
 }

@@ -25,7 +25,7 @@ class DataForUserFragment : Fragment(), View.OnClickListener {
     private val dataViewModel: DataViewModel by viewModels()
 
     private lateinit var observerToken: Observer<Token>
-    lateinit var token: Token
+    private lateinit var token: Token
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,11 +39,9 @@ class DataForUserFragment : Fragment(), View.OnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-
         observerToken = Observer {
-            token = it
-            dataViewModel.verifyToken(VerifyTokenResponse(it.access_token))
+            token = it?: Token()
+            dataViewModel.verifyToken(VerifyTokenResponse(token.access_token))
                 .observe(viewLifecycleOwner) {
                     when (it) {
                         TokenVerifyStatus.SUCCESS -> {
@@ -55,25 +53,29 @@ class DataForUserFragment : Fragment(), View.OnClickListener {
                     }
                 }
         }
-        dataViewModel.getToken().observe(viewLifecycleOwner, observerToken)
 
-        dataViewModel.getDataForAllUser().observe(viewLifecycleOwner) {
-            mBinding.answerFromServerAllId.text = it
-        }
-        mBinding.logoutButtonId.setOnClickListener(this)
+    dataViewModel.getToken().observe(viewLifecycleOwner, observerToken)
+
+    dataViewModel.getDataForAllUser().observe(viewLifecycleOwner)
+    {
+        mBinding.answerFromServerAllId.text = it
     }
+    mBinding.logoutButtonId.setOnClickListener(this)
+}
 
-    override fun onClick(v: View) {
-        if (v.id == R.id.logout_button_id) {
-            dataViewModel.deleteToken(token){
+override fun onClick(v: View) {
+    if (v.id == R.id.logout_button_id) {
+        if (token != null) {
+            dataViewModel.deleteToken(token!!) {
                 APP_AUTH_ACTIVITY.navController.navigate(R.id.action_dataForUser_to_loginFragment)
             }
         }
     }
+}
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        dataViewModel.getToken().removeObserver(observerToken)
-        _binding = null
-    }
+override fun onDestroyView() {
+    super.onDestroyView()
+    dataViewModel.getToken().removeObserver(observerToken)
+    _binding = null
+}
 }

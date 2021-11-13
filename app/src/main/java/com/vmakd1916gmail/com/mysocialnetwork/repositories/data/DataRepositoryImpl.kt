@@ -21,7 +21,7 @@ class DataRepositoryImpl @Inject constructor(
     private val mySocialNetworkDAO: MySocialNetworkDAO
 ) {
 
-    fun getDataForLoginUser(accessToken: String): LiveData<String> {
+    fun getDataForLoginUser(accessToken: String?): LiveData<String> {
         val call = dataService.getDataLoginUser("Bearer $accessToken")
         val liveData = MutableLiveData<String>()
         call?.enqueue(object : Callback<String?> {

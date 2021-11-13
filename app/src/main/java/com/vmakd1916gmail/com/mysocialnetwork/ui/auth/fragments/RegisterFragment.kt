@@ -42,6 +42,7 @@ class RegisterFragment : Fragment(), View.OnClickListener {
             APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_loginFragment)
         }
         mBinding.registerBtnId.setOnClickListener(this)
+        mBinding.noLoginButtonId.setOnClickListener(this)
     }
 
     override fun onClick(v: View) {
@@ -65,6 +66,9 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                     ).show()
                 }
             }
+        }
+        if (v.id == R.id.no_login_button_id){
+            APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
         }
     }
 
@@ -100,6 +104,9 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                                     when(it){
                                         RefreshStatus.SUCCESS->{
                                             APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
+                                        }
+                                        RefreshStatus.FAIL->{
+                                            mBinding.progressBar.visibility = View.GONE
                                         }
                                     }
                                 }

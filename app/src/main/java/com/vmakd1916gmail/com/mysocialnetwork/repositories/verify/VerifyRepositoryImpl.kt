@@ -14,7 +14,7 @@ import javax.inject.Inject
 class VerifyRepositoryImpl @Inject constructor(
     private val verifyService: VerifyService) {
 
-    fun verifyToken(token: VerifyTokenResponse): LiveData<TokenVerifyStatus> {
+    fun verifyToken(token: VerifyTokenResponse?): LiveData<TokenVerifyStatus> {
         val call = verifyService.verifyToken(token)
         val verifyStatus = MutableLiveData<TokenVerifyStatus>()
         call?.enqueue(object : Callback<VerifyTokenResponse?> {

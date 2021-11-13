@@ -9,6 +9,6 @@ import java.util.*
 )
 data class Token(
     @PrimaryKey val token_id: UUID = UUID.randomUUID(),
-    @SerializedName("refresh") val refresh_token: String,
-    @SerializedName("access") val access_token: String
+    @SerializedName("refresh") val refresh_token: String?="",
+    @SerializedName("access") val access_token: String?=""
 )

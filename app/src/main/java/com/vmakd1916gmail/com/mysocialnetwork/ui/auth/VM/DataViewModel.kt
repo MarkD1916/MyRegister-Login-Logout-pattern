@@ -23,11 +23,11 @@ class DataViewModel @Inject constructor(
     private val verifyRepository: VerifyRepositoryImpl
 ) : ViewModel() {
 
-    fun getDataForLoginUser(accessToken: String): LiveData<String> {
+    fun getDataForLoginUser(accessToken: String?): LiveData<String> {
         return repository.getDataForLoginUser(accessToken)
     }
 
-    fun verifyToken(token: VerifyTokenResponse): LiveData<TokenVerifyStatus> {
+    fun verifyToken(token: VerifyTokenResponse?): LiveData<TokenVerifyStatus> {
         return verifyRepository.verifyToken(token)
     }
 
