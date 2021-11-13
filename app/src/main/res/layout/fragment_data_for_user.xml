@@ -10,17 +10,19 @@
         android:id="@+id/answer_from_server_all_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
+        android:text="loading..."
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/data_from_server_all_label_id" />
+        app:layout_constraintTop_toBottomOf="@+id/data_from_server_all_label_id"
+        android:textSize="20dp"/>
 
     <TextView
         android:id="@+id/answer_from_server_auth_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="You are not loggin user!"
+        android:textSize="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/data_from_server_auth_label_id" />
@@ -32,7 +34,8 @@
         android:text="Data for auth users"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:textSize="25dp"/>
 
     <TextView
         android:id="@+id/data_from_server_all_label_id"
@@ -41,7 +44,8 @@
         android:text="Data for all users"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/answer_from_server_auth_id" />
+        app:layout_constraintTop_toBottomOf="@+id/answer_from_server_auth_id"
+        android:textSize="25dp"/>
 
     <Button
         android:id="@+id/logout_button_id"
