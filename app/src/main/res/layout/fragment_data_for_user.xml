@@ -21,7 +21,7 @@
         android:id="@+id/answer_from_server_auth_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="You are not loggin user!"
+        android:text="You are not login user!"
         android:textSize="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
