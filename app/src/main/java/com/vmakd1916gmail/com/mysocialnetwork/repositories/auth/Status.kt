@@ -15,3 +15,7 @@ enum class RefreshStatus{
 enum class TokenVerifyStatus {
     SUCCESS, FAIL
 }
+
+enum class ServerAnswerStatus {
+    SUCCESS, FAIL, LOADING
+}

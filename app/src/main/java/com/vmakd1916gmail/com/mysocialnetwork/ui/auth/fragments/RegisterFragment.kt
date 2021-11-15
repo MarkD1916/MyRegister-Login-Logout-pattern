@@ -53,71 +53,51 @@ class RegisterFragment : Fragment(), View.OnClickListener {
 
             val userResponse = authViewModel.createUserResponse(userName, userPassword)
 
-            authViewModel.registerUser(userResponse).observe(viewLifecycleOwner) {
-                if (it == RegisterStatus.SUCCESS) {
-                    auth(userResponse)
-                }
-
-                if (it == RegisterStatus.FAIL) {
-                    Toast.makeText(
-                        APP_AUTH_ACTIVITY,
-                        "You are already register",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
         }
-        if (v.id == R.id.no_login_button_id){
-            APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
+        if (v.id == R.id.no_login_button_id) {
+            if (APP_AUTH_ACTIVITY.navController.previousBackStackEntry != null) {
+                APP_AUTH_ACTIVITY.navController.popBackStack()
+            } else {
+                APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
+            }
         }
     }
 
 
-    private fun auth(userResponse: UserResponse) {
-        authViewModel.authUser(userResponse).observe(viewLifecycleOwner) {
-            when (it) {
-                AuthStatus.SUCCESS -> {
-                    APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
-                }
-                AuthStatus.FAIL -> {
-                    Toast.makeText(APP_AUTH_ACTIVITY, "Sorry smth go wrong!", Toast.LENGTH_SHORT)
-                        .show()
-                }
-            }
 
-        }
-
-    }
 
     private fun loginIfAuth() {
-        authViewModel.getToken().observe(viewLifecycleOwner) {
-            if (it != null) {
-                val token = it
-                authViewModel.verifyToken(VerifyTokenResponse(it.access_token))
-                    .observe(viewLifecycleOwner) {
-                        when (it) {
-                            TokenVerifyStatus.SUCCESS -> {
-                                APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
-                            }
-                            TokenVerifyStatus.FAIL->{
-                                authViewModel.refreshToken(RefreshTokenResponse(token.refresh_token)).observe(viewLifecycleOwner){
-                                    when(it){
-                                        RefreshStatus.SUCCESS->{
-                                            APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
-                                        }
-                                        RefreshStatus.FAIL->{
-                                            mBinding.progressBar.visibility = View.GONE
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-            }
-            else{
-                mBinding.progressBar.visibility = View.GONE
-            }
+        authViewModel.getToken().observe(viewLifecycleOwner){
+
         }
+//        authViewModel.getToken().observe(viewLifecycleOwner) {
+//            if (it != null) {
+//                val token = it
+//                authViewModel.verifyToken(VerifyTokenResponse(it.access_token))
+//                    .observe(viewLifecycleOwner) {
+//                        when (it) {
+//                            TokenVerifyStatus.SUCCESS -> {
+//                                APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
+//                            }
+//                            TokenVerifyStatus.FAIL -> {
+//                                authViewModel.refreshToken(RefreshTokenResponse(token.refresh_token))
+//                                    .observe(viewLifecycleOwner) {
+//                                        when (it) {
+//                                            RefreshStatus.SUCCESS -> {
+//                                                APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
+//                                            }
+//                                            RefreshStatus.FAIL -> {
+//                                                mBinding.progressBar.visibility = View.GONE
+//                                            }
+//                                        }
+//                                    }
+//                            }
+//                        }
+//                    }
+//            } else {
+//                mBinding.progressBar.visibility = View.GONE
+//            }
+//        }
     }
 
 }

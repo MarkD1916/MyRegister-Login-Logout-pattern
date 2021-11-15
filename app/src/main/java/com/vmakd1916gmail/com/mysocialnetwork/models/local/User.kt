@@ -7,5 +7,5 @@ import java.util.*
 @Entity(tableName = "user_table")
 data class User(
     @PrimaryKey val userID:UUID,
-    val userName:String
+    val userName:String?
 )
