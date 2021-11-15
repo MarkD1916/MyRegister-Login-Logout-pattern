@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import com.vmakd1916gmail.com.mysocialnetwork.R
 import com.vmakd1916gmail.com.mysocialnetwork.databinding.FragmentRegisterBinding
 import com.vmakd1916gmail.com.mysocialnetwork.models.Token
+import com.vmakd1916gmail.com.mysocialnetwork.models.local.User
 import com.vmakd1916gmail.com.mysocialnetwork.models.network.VerifyTokenResponse
 import com.vmakd1916gmail.com.mysocialnetwork.models.network.RefreshTokenResponse
 import com.vmakd1916gmail.com.mysocialnetwork.models.network.UserResponse
@@ -29,6 +30,7 @@ class RegisterFragment : Fragment(), View.OnClickListener {
     val mBinding get() = _binding!!
 
     private val authViewModel: AuthViewModel by viewModels()
+    private var userResponse:UserResponse?=null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,7 +38,7 @@ class RegisterFragment : Fragment(), View.OnClickListener {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentRegisterBinding.inflate(layoutInflater, container, false)
-        loginIfAuth()
+
         return mBinding.root
     }
 
@@ -47,6 +49,21 @@ class RegisterFragment : Fragment(), View.OnClickListener {
         }
         mBinding.registerBtnId.setOnClickListener(this)
         mBinding.noLoginButtonId.setOnClickListener(this)
+
+        authViewModel.registerStatus.observe(viewLifecycleOwner, EventObserver(
+            onError = {
+                mBinding.progressBar.visibility = View.GONE
+                snackbar(it)
+            },
+            onLoading = {
+                mBinding.progressBar.visibility = View.VISIBLE
+            }
+        ) {
+            mBinding.progressBar.visibility = View.GONE
+            authViewModel.authUser(userResponse!!)
+
+        })
+        loginIfAuth()
     }
 
     override fun onClick(v: View) {
@@ -55,7 +72,10 @@ class RegisterFragment : Fragment(), View.OnClickListener {
             val userName = mBinding.loginEditTextTextPersonName.text.toString()
             val userPassword = mBinding.loginEditTextTextPassword.text.toString()
 
-            val userResponse = authViewModel.createUserResponse(userName, userPassword)
+            userResponse = authViewModel.createUserResponse(userName, userPassword)
+
+            authViewModel.registerUser(userResponse!!)
+
 
         }
         if (v.id == R.id.no_login_button_id) {
@@ -75,14 +95,11 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                 authViewModel.verifyTokenResponse
                     .observe(viewLifecycleOwner, EventObserver(
                         onError = {
-
                             authViewModel.refreshToken(RefreshTokenResponse(token.refresh_token))
-
                         },
                         onLoading = {
                             mBinding.progressBar.visibility = View.VISIBLE
                         }
-
                     ) {
                         APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
                     })
@@ -90,15 +107,10 @@ class RegisterFragment : Fragment(), View.OnClickListener {
         }
         authViewModel.accessTokenResponse.observe(viewLifecycleOwner, EventObserver(
             onError = {
-                Log.d(TAG, "loginIfAuth: $it")
                 mBinding.progressBar.visibility = View.GONE
                 snackbar(it)
-
             },
-            onLoading = {
-
-            }
-
+            onLoading = {}
         ) {
 
             APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)

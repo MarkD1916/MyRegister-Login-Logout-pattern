@@ -66,9 +66,8 @@ class LoginFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(v: View) {
         if (v.id == R.id.login_btn_id) {
-            val userName = "Mark1"//mBinding.registerEditTextTextPersonName.text.toString()
-            val userPassword = "1234567890"//mBinding.registerEditTextTextPassword.text.toString()
-            Log.d(TAG, "onClick: ")
+            val userName = mBinding.registerEditTextTextPersonName.text.toString()
+            val userPassword = mBinding.registerEditTextTextPassword.text.toString()
             val userResponse = authViewModel.createUserResponse(userName, userPassword)
             authViewModel.authUser(userResponse)
 
