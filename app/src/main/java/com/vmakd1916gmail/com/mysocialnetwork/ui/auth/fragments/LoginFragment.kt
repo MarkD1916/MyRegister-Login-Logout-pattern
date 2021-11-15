@@ -40,11 +40,9 @@ class LoginFragment : Fragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         mBinding.goToRegisterBtnId.setOnClickListener {
-            if (APP_AUTH_ACTIVITY.navController.previousBackStackEntry != null) {
-                APP_AUTH_ACTIVITY.navController.popBackStack()
-            } else {
+
                 APP_AUTH_ACTIVITY.navController.navigate(R.id.action_loginFragment_to_registerFragment)
-            }
+
         }
         mBinding.loginBtnId.setOnClickListener(this)
         authViewModel.authStatus.observe(viewLifecycleOwner, EventObserver(

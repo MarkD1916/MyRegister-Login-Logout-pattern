@@ -63,7 +63,6 @@ class RegisterFragment : Fragment(), View.OnClickListener {
 
         loginIfAuth()
 
-
         authViewModel.authStatus.observe(viewLifecycleOwner, EventObserver(
             onError = {
                 snackbar(it)
@@ -85,12 +84,8 @@ class RegisterFragment : Fragment(), View.OnClickListener {
 
         }
         if (v.id == R.id.no_login_button_id) {
-            if (APP_AUTH_ACTIVITY.navController.previousBackStackEntry != null) {
-                APP_AUTH_ACTIVITY.navController.popBackStack()
-            } else {
-                APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
+            APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
             }
-        }
     }
 
     private fun loginIfAuth() {
