@@ -51,12 +51,13 @@ class DataForUserFragment : Fragment(), View.OnClickListener {
             onLoading = {}
         ) {
             mBinding.answerFromServerAuthId.text = it
+            mBinding.logoutButtonId.visibility = View.VISIBLE
         })
 
         dataViewModel.getDataForAllUser().observe(viewLifecycleOwner)
         {
             mBinding.answerFromServerAllId.text = it
-            mBinding.logoutButtonId.visibility = View.VISIBLE
+
         }
         mBinding.logoutButtonId.setOnClickListener(this)
     }
