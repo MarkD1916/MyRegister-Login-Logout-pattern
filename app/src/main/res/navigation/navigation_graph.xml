@@ -13,9 +13,7 @@
             app:destination="@id/registerFragment" />
         <action
             android:id="@+id/action_loginFragment_to_dataForUser"
-            app:destination="@id/dataForUser"
-            app:launchSingleTop="true"
-            app:popUpTo="@id/navigation_graph" />
+            app:destination="@id/dataForUser" />
     </fragment>
     <fragment
         android:id="@+id/registerFragment"
@@ -34,8 +32,6 @@
         android:label="DataForUser" >
         <action
             android:id="@+id/action_dataForUser_to_loginFragment"
-            app:destination="@id/loginFragment"
-            app:launchSingleTop="true"
-            app:popUpTo="@id/navigation_graph" />
+            app:destination="@id/loginFragment" />
     </fragment>
 </navigation>

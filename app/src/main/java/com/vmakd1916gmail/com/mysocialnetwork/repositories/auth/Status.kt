@@ -1,21 +1,14 @@
 package com.vmakd1916gmail.com.mysocialnetwork.repositories.auth
 
-enum class RegisterStatus {
-    SUCCESS, FAIL
-}
+import android.util.Log
+import kotlin.properties.Delegates
 
-enum class AuthStatus {
-    SUCCESS, FAIL
-}
-
-enum class RefreshStatus{
-    SUCCESS, FAIL
-}
 
 enum class TokenVerifyStatus {
-    SUCCESS, FAIL
+    SUCCESS
 }
-
-enum class ServerAnswerStatus {
-    SUCCESS, FAIL, LOADING
+object Variables {
+    var isNetworkConnected: Boolean by Delegates.observable(false) { property, oldValue, newValue ->
+        Log.d("Network connectivity", "$newValue")
+    }
 }

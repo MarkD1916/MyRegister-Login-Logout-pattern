@@ -14,7 +14,6 @@ import com.vmakd1916gmail.com.mysocialnetwork.databinding.FragmentLoginBinding
 import com.vmakd1916gmail.com.mysocialnetwork.models.network.UserResponse
 import com.vmakd1916gmail.com.mysocialnetwork.other.APP_AUTH_ACTIVITY
 import com.vmakd1916gmail.com.mysocialnetwork.other.EventObserver
-import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.AuthStatus
 import com.vmakd1916gmail.com.mysocialnetwork.ui.auth.VM.AuthViewModel
 import com.vmakd1916gmail.com.mysocialnetwork.ui.snackbar
 import dagger.hilt.android.AndroidEntryPoint

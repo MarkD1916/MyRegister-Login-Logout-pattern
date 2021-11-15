@@ -126,10 +126,6 @@ class AuthViewModel @Inject constructor(
     }
 
 
-
-
-
-
     fun createUserResponse(userName: String, userPassword: String): UserResponse {
         return UserResponse(userName, userPassword)
     }

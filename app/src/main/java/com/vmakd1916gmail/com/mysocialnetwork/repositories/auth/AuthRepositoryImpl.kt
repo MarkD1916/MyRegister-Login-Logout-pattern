@@ -13,6 +13,7 @@ import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.Exception
 import java.util.*
 import javax.inject.Inject
 
@@ -26,10 +27,13 @@ class AuthRepositoryImpl @Inject constructor(
 
 
     suspend fun registerUser(userResponse: UserResponse):Resource<Response<UserResponse>> {
-        val call = authService.registerUser(userResponse)
-        return withContext(Dispatchers.IO) {
 
+        return withContext(Dispatchers.IO) {
             safeCall {
+                if (!Variables.isNetworkConnected){
+                    throw Exception("No Internet connection")
+                }
+                val call = authService.registerUser(userResponse)
                 val result = getAuthDataFromServer(call)
                 Resource.Success(result)
             }
@@ -38,9 +42,13 @@ class AuthRepositoryImpl @Inject constructor(
 
 
     suspend fun authUser(user: UserResponse): Resource<Response<TokenResponse>> {
-        val call = authService.authUser(user)
+
         return withContext(Dispatchers.IO) {
             safeCall {
+                if (!Variables.isNetworkConnected){
+                    throw Exception("No Internet connection")
+                }
+                val call = authService.authUser(user)
                 val result = getAuthDataFromServer(call)
                 Resource.Success(result)
             }

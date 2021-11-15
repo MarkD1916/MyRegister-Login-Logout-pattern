@@ -52,7 +52,6 @@ object AppModule {
     @Provides
     @Singleton
     fun provideRetrofit(BASE_URL: String): Retrofit = Retrofit.Builder()
-
         .addConverterFactory(GsonConverterFactory.create())
         .baseUrl(BASE_URL)
         .build()

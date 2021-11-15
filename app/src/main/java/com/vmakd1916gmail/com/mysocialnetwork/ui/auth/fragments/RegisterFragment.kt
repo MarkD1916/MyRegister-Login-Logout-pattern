@@ -13,9 +13,11 @@ import com.vmakd1916gmail.com.mysocialnetwork.models.network.UserResponse
 import com.vmakd1916gmail.com.mysocialnetwork.models.network.VerifyTokenResponse
 import com.vmakd1916gmail.com.mysocialnetwork.other.APP_AUTH_ACTIVITY
 import com.vmakd1916gmail.com.mysocialnetwork.other.EventObserver
+import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.Variables
 import com.vmakd1916gmail.com.mysocialnetwork.ui.auth.VM.AuthViewModel
 import com.vmakd1916gmail.com.mysocialnetwork.ui.snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import java.lang.Exception
 
 private const val TAG = "RegisterFragment"
 
@@ -58,7 +60,10 @@ class RegisterFragment : Fragment(), View.OnClickListener {
             authViewModel.authUser(userResponse!!)
 
         })
+
         loginIfAuth()
+
+
         authViewModel.authStatus.observe(viewLifecycleOwner, EventObserver(
             onError = {
                 snackbar(it)

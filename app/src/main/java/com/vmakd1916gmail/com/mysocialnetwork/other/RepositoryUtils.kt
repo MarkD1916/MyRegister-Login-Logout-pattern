@@ -1,5 +1,6 @@
 package com.vmakd1916gmail.com.mysocialnetwork.other
 
+import com.vmakd1916gmail.com.mysocialnetwork.repositories.auth.Variables
 import retrofit2.Response
 import java.lang.Exception
 
@@ -12,6 +13,10 @@ inline fun <T> safeCall(action: () -> Resource<T>): Resource<T> {
 }
 
 fun <T> getAuthDataFromServer(response: Response<T>): Response<T> {
+    if (!Variables.isNetworkConnected){
+        throw Exception("No Internet connection")
+    }
+
     if (response.isSuccessful) {
         return response
     } else {
