@@ -14,7 +14,4 @@ interface AuthService {
     @POST("auth/jwt/create/")
     suspend fun authUser(@Body user: UserResponse): Response<TokenResponse>
 
-    @POST("auth/jwt/refresh/")
-    suspend fun refreshToken(@Body token: RefreshTokenResponse): Response<AccessTokenResponse>
-
 }

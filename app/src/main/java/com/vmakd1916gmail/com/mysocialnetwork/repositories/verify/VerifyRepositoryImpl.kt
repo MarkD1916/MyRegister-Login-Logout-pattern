@@ -1,5 +1,7 @@
 package com.vmakd1916gmail.com.mysocialnetwork.repositories.verify
 
+import com.vmakd1916gmail.com.mysocialnetwork.models.network.AccessTokenResponse
+import com.vmakd1916gmail.com.mysocialnetwork.models.network.RefreshTokenResponse
 import com.vmakd1916gmail.com.mysocialnetwork.models.network.VerifyTokenResponse
 import com.vmakd1916gmail.com.mysocialnetwork.other.Resource
 import com.vmakd1916gmail.com.mysocialnetwork.other.getAuthDataFromServer
@@ -15,6 +17,16 @@ class VerifyRepositoryImpl @Inject constructor(
 
     suspend fun verifyToken(token: VerifyTokenResponse?): Resource<Response<VerifyTokenResponse>> {
         val call = verifyService.verifyToken(token)
+        return withContext(Dispatchers.IO) {
+            safeCall {
+                val result = getAuthDataFromServer(call)
+                Resource.Success(result)
+            }
+        }
+    }
+
+    suspend fun refreshToken(refreshTokenResponse: RefreshTokenResponse): Resource<Response<AccessTokenResponse>> {
+        val call = verifyService.refreshToken(refreshTokenResponse)
         return withContext(Dispatchers.IO) {
             safeCall {
                 val result = getAuthDataFromServer(call)

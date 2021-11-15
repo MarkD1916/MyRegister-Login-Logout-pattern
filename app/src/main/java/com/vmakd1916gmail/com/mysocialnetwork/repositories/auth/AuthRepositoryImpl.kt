@@ -47,15 +47,7 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    suspend fun refreshToken(refreshTokenResponse: RefreshTokenResponse): Resource<Response<AccessTokenResponse>> {
-        val call = authService.refreshToken(refreshTokenResponse)
-        return withContext(Dispatchers.IO) {
-            safeCall {
-                val result = getAuthDataFromServer(call)
-                Resource.Success(result)
-            }
-        }
-    }
+
 
 
     fun getToke(): LiveData<Token> {

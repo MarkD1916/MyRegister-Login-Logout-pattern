@@ -27,9 +27,9 @@ class DataViewModel @Inject constructor(
         return repository.getDataForLoginUser(accessToken)
     }
 
-    fun verifyToken(token: VerifyTokenResponse?): LiveData<TokenVerifyStatus> {
-        return verifyRepository.verifyToken(token)
-    }
+//    fun verifyToken(token: VerifyTokenResponse?): LiveData<TokenVerifyStatus> {
+//        return verifyRepository.verifyToken(token)
+//    }
 
     fun getToken(): LiveData<Token> {
         return repository.getToke()

@@ -52,6 +52,9 @@ class AuthViewModel @Inject constructor(
     private val _accessTokenResponse = MutableLiveData<Event<Resource<AccessTokenResponse>>>()
     val accessTokenResponse:LiveData<Event<Resource<AccessTokenResponse>>> = _accessTokenResponse
 
+    private val _verifyTokenResponse = MutableLiveData<Event<Resource<TokenVerifyStatus>>>()
+    val verifyTokenResponse:LiveData<Event<Resource<TokenVerifyStatus>>> = _verifyTokenResponse
+
     fun authUser(user: UserResponse) {
         _authStatus.postValue(Event(Resource.Loading()))
         viewModelScope.launch(Dispatchers.IO) {
@@ -69,10 +72,30 @@ class AuthViewModel @Inject constructor(
 
     }
 
+    fun verifyToken(token: VerifyTokenResponse) {
+        _verifyTokenResponse.postValue(Event(Resource.Loading()))
+        viewModelScope.launch(Dispatchers.IO) {
+            val response = verifyRepository.verifyToken(token)
+            if (response.data!=null) {
+                _verifyTokenResponse.postValue(Event(Resource.Success(TokenVerifyStatus.SUCCESS)))
+            }
+            else {
+                _verifyTokenResponse.postValue(Event(Resource.Error(response.message!!)))
+            }
+
+        }
+    }
+
     fun refreshToken(refreshTokenResponse: RefreshTokenResponse) {
         _accessTokenResponse.postValue(Event(Resource.Loading()))
         viewModelScope.launch(Dispatchers.IO) {
-            repository.refreshToken(refreshTokenResponse)
+            val response = verifyRepository.refreshToken(refreshTokenResponse)
+            if (response.data!=null) {
+                _accessTokenResponse.postValue(Event(Resource.Success(response.data.body()!!)))
+            }
+            else {
+                _accessTokenResponse.postValue(Event(Resource.Error(response.message!!)))
+            }
         }
     }
 
@@ -104,9 +127,7 @@ class AuthViewModel @Inject constructor(
 
 
 
-    fun verifyToken(token: VerifyTokenResponse): LiveData<TokenVerifyStatus> {
-        return verifyRepository.verifyToken(token)
-    }
+
 
 
     fun createUserResponse(userName: String, userPassword: String): UserResponse {

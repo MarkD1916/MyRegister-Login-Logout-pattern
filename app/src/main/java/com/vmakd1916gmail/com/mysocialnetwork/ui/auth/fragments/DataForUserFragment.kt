@@ -24,8 +24,7 @@ class DataForUserFragment : Fragment(), View.OnClickListener {
     val mBinding get() = _binding!!
     private val dataViewModel: DataViewModel by viewModels()
 
-    private lateinit var observerToken: Observer<Token>
-    private lateinit var token: Token
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,26 +38,26 @@ class DataForUserFragment : Fragment(), View.OnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        observerToken = Observer {
-            token = it ?: Token()
-            dataViewModel.verifyToken(VerifyTokenResponse(token.access_token))
-                .observe(viewLifecycleOwner) {
-                    when (it) {
-                        TokenVerifyStatus.SUCCESS -> {
-                            dataViewModel.getDataForLoginUser(token.access_token)
-                                .observe(viewLifecycleOwner) {
-                                    mBinding.answerFromServerAuthId.text = it
-                                }
-                            mBinding.logoutButtonId.visibility = View.VISIBLE
-                        }
-                        TokenVerifyStatus.FAIL ->{
+//        observerToken = Observer {
+//            token = it ?: Token()
+//            dataViewModel.verifyToken(VerifyTokenResponse(token.access_token))
+//                .observe(viewLifecycleOwner) {
+//                    when (it) {
+//                        TokenVerifyStatus.SUCCESS -> {
+//                            dataViewModel.getDataForLoginUser(token.access_token)
+//                                .observe(viewLifecycleOwner) {
+//                                    mBinding.answerFromServerAuthId.text = it
+//                                }
+//                            mBinding.logoutButtonId.visibility = View.VISIBLE
+//                        }
+//                        TokenVerifyStatus.FAIL ->{
+//
+//                        }
+//                    }
+//                }
+//        }
 
-                        }
-                    }
-                }
-        }
-
-        dataViewModel.getToken().observe(viewLifecycleOwner, observerToken)
+//        dataViewModel.getToken().observe(viewLifecycleOwner, observerToken)
 
         dataViewModel.getDataForAllUser().observe(viewLifecycleOwner)
         {
@@ -70,16 +69,14 @@ class DataForUserFragment : Fragment(), View.OnClickListener {
     override fun onClick(v: View) {
         if (v.id == R.id.logout_button_id) {
 
-            dataViewModel.deleteToken(token) {
-                APP_AUTH_ACTIVITY.navController.navigate(R.id.action_dataForUser_to_loginFragment)
-            }
+
 
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        dataViewModel.getToken().removeObserver(observerToken)
+
         _binding = null
     }
 }
