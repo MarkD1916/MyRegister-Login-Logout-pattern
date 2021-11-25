@@ -9,6 +9,7 @@ import com.vmakd1916gmail.com.login_logout_register.DB.MySocialNetworkDAO
 import com.vmakd1916gmail.com.login_logout_register.DB.MySocialNetworkDatabase
 import com.vmakd1916gmail.com.login_logout_register.R
 import com.vmakd1916gmail.com.login_logout_register.repositories.auth.AuthRepositoryImpl
+import com.vmakd1916gmail.com.login_logout_register.repositories.auth.RequestTokenInterceptor
 import com.vmakd1916gmail.com.login_logout_register.repositories.data.DataRepositoryImpl
 import com.vmakd1916gmail.com.login_logout_register.repositories.verify.VerifyRepositoryImpl
 import com.vmakd1916gmail.com.login_logout_register.services.AuthService
@@ -19,6 +20,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -35,26 +37,31 @@ object AppModule {
         @ApplicationContext context: Context
     ) = context
 
-    @Singleton
     @Provides
-    fun providePicassoInstance(
-        @ApplicationContext context: Context
-    ) = Glide.with(context).setDefaultRequestOptions(
-        RequestOptions()
-            .placeholder(R.drawable.ic_round_hourglass_bottom_24)
-            .error(R.drawable.ic_baseline_error_outline_24)
-            .diskCacheStrategy(DiskCacheStrategy.DATA)
-    )
-
-    @Provides
-    fun providesBaseUrl(): String = "https://vmakdsocialnetwork.herokuapp.com/"
+    fun provideBaseUrl(): String = "https://vmakdsocialnetwork.herokuapp.com/"
 
     @Provides
     @Singleton
-    fun provideRetrofit(BASE_URL: String): Retrofit = Retrofit.Builder()
-        .addConverterFactory(GsonConverterFactory.create())
-        .baseUrl(BASE_URL)
-        .build()
+    fun provideRequestInterceptor(): RequestTokenInterceptor =
+        RequestTokenInterceptor()
+
+    @Provides
+    fun provideOkHttpClient(requestTokenInterceptor: RequestTokenInterceptor): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(requestTokenInterceptor)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(BASE_URL: String,client: OkHttpClient): Retrofit{
+
+        return Retrofit.Builder()
+            .addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(BASE_URL)
+            .client(client)
+            .build()
+    }
 
     @Provides
     @Singleton

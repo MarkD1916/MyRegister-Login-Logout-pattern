@@ -4,6 +4,8 @@ package com.vmakd1916gmail.com.login_logout_register.DB
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.vmakd1916gmail.com.login_logout_register.models.Token
+import io.reactivex.Flowable
+import io.reactivex.Observable
 
 
 @Dao
@@ -13,7 +15,10 @@ interface MySocialNetworkDAO {
     suspend fun insertToken(vararg token: Token?)
 
     @Query("SELECT * FROM token_table")
-    fun getToken():LiveData<Token>
+    fun getToken(): LiveData<Token>
+
+    @Query("SELECT * FROM token_table")
+    fun getRxToken(): Observable<Token>
 
     @Query("UPDATE token_table SET access_token=:accessToken")
     fun updateAccessToken(accessToken:String)

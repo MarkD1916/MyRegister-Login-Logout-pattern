@@ -10,6 +10,7 @@ import com.vmakd1916gmail.com.login_logout_register.R
 import com.vmakd1916gmail.com.login_logout_register.databinding.FragmentLoginBinding
 import com.vmakd1916gmail.com.login_logout_register.other.APP_AUTH_ACTIVITY
 import com.vmakd1916gmail.com.login_logout_register.other.EventObserver
+import com.vmakd1916gmail.com.login_logout_register.other.TOKEN
 import com.vmakd1916gmail.com.login_logout_register.ui.auth.VM.AuthViewModel
 import com.vmakd1916gmail.com.login_logout_register.ui.snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -51,6 +52,7 @@ class LoginFragment : Fragment(), View.OnClickListener {
             }
 
         ){
+            TOKEN = it.access_token
             APP_AUTH_ACTIVITY.navController.navigate(R.id.action_loginFragment_to_dataForUser)
         })
 

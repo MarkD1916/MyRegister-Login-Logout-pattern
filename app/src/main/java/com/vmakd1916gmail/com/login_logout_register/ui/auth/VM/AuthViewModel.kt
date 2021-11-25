@@ -128,4 +128,10 @@ class AuthViewModel @Inject constructor(
         return UserResponse(userName, userPassword)
     }
 
+    fun updateToken(accessToken:String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateToken(accessToken)
+        }
+    }
+
 }

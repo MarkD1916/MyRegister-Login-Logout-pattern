@@ -13,6 +13,7 @@ import com.vmakd1916gmail.com.login_logout_register.models.network.UserResponse
 import com.vmakd1916gmail.com.login_logout_register.models.network.VerifyTokenResponse
 import com.vmakd1916gmail.com.login_logout_register.other.APP_AUTH_ACTIVITY
 import com.vmakd1916gmail.com.login_logout_register.other.EventObserver
+import com.vmakd1916gmail.com.login_logout_register.other.TOKEN
 import com.vmakd1916gmail.com.login_logout_register.ui.auth.VM.AuthViewModel
 import com.vmakd1916gmail.com.login_logout_register.ui.snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -89,6 +90,7 @@ class RegisterFragment : Fragment(), View.OnClickListener {
     private fun loginIfAuth() {
         authViewModel.getToken().observe(viewLifecycleOwner) {
             it?.let { token -> it
+
                 authViewModel.verifyToken(VerifyTokenResponse(token.access_token))
                 authViewModel.verifyTokenResponse
                     .observe(viewLifecycleOwner, EventObserver(
@@ -99,6 +101,7 @@ class RegisterFragment : Fragment(), View.OnClickListener {
                             mBinding.progressBar.visibility = View.VISIBLE
                         }
                     ) {
+                        TOKEN = token.access_token
                         APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
                     })
             }
@@ -110,7 +113,8 @@ class RegisterFragment : Fragment(), View.OnClickListener {
             },
             onLoading = {}
         ) {
-
+            authViewModel.updateToken(it.access_token)
+            TOKEN = it.access_token
             APP_AUTH_ACTIVITY.navController.navigate(R.id.action_registerFragment_to_dataForUser)
         })
         mBinding.progressBar.visibility = View.GONE

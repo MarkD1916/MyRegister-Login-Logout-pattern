@@ -9,7 +9,7 @@ import retrofit2.http.Header
 interface DataService {
 
     @GET("restricted/")
-    suspend fun getDataLoginUser(@Header("Authorization") accessToken:String): Response<String>
+    suspend fun getDataLoginUser(): Response<String>
 
     @GET("checkserver/")
     fun getDataAllUser(): Call<String?>?

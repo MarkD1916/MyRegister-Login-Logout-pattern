@@ -29,7 +29,7 @@ class DataRepositoryImpl @Inject constructor(
                 if (!Variables.isNetworkConnected) {
                     throw Exception("No Internet connection")
                 }
-                val call = dataService.getDataLoginUser("Bearer $accessToken")
+                val call = dataService.getDataLoginUser()
                 val result = getAuthDataFromServer(call)
                 Resource.Success(result)
             }

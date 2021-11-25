@@ -53,7 +53,9 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
 
-
+    suspend fun updateToken(accessToken:String) {
+        mySocialNetworkDAO.updateAccessToken(accessToken)
+    }
 
     fun getToke(): LiveData<Token> {
         return mySocialNetworkDAO.getToken()
