@@ -23,6 +23,9 @@ interface MySocialNetworkDAO {
     @Query("UPDATE token_table SET access_token=:accessToken")
     fun updateAccessToken(accessToken:String)
 
-    @Delete
-    fun deleteToken(token:Token)
+//    @Delete
+//    fun deleteToken(token:Token)
+
+    @Query("DELETE FROM token_table")
+    fun deleteToken()
 }

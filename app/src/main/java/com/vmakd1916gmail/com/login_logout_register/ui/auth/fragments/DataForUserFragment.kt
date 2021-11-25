@@ -63,7 +63,11 @@ class DataForUserFragment : Fragment(), View.OnClickListener {
     override fun onClick(v: View) {
         if (v.id == R.id.logout_button_id) {
             TOKEN = null
-            APP_AUTH_ACTIVITY.navController.navigate(R.id.action_dataForUser_to_loginFragment)
+            dataViewModel.deleteToken() {
+                APP_AUTH_ACTIVITY.navController.navigate(R.id.action_dataForUser_to_loginFragment)
+
+            }
+
 
         }
 

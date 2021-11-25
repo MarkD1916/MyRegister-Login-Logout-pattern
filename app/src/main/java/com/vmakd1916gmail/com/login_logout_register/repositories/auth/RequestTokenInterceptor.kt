@@ -17,12 +17,22 @@ class RequestTokenInterceptor : Interceptor {
 
         when (request.method()) {
             "GET" -> {
-                val newRequest =
-                    request.newBuilder().addHeader("Authorization", "Bearer $TOKEN")
-                    .method(request.method(), request.body())
-                    .build()
+                if (TOKEN!=null) {
+                    val newRequest =
+                        request.newBuilder().addHeader("Authorization", "Bearer $TOKEN")
+                            .method(request.method(), request.body())
+                            .build()
+                    return chain.proceed(newRequest)
+                }
+                else{
+                    val newRequest =
+                        request.newBuilder()
+                            .method(request.method(), request.body())
+                            .build()
+                    return chain.proceed(newRequest)
+                }
 
-                return chain.proceed(newRequest)
+
 
             }
             else -> {

@@ -47,11 +47,11 @@ class DataViewModel @Inject constructor(
         return repository.getDataAllUser()
     }
 
-    fun deleteToken(token: Token, onSuccess: () -> Unit) {
+    fun deleteToken(onSuccess: () -> Unit) {
         onSuccess()
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                repository.deleteToken(token)
+                repository.deleteToken()
             }
         }
     }

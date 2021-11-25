@@ -56,7 +56,7 @@ class DataRepositoryImpl @Inject constructor(
         return mySocialNetworkDAO.getToken()
     }
 
-    fun deleteToken(token: Token) {
-        mySocialNetworkDAO.deleteToken(token)
+    fun deleteToken() {
+        mySocialNetworkDAO.deleteToken()
     }
 }
